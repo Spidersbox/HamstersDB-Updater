@@ -215,7 +215,7 @@ void MainWindow::download(const QUrl &downTo,QNetworkReply *reply)
   connect(&manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(downloadFinished(QNetworkReply*)));
   QNetworkRequest request;
 
-  QString tempurl=downLocation+"/"+appFilename;
+  QString tempurl=getDownloadLocation(downLocation)+"/"+appFilename;
   request.setUrl(tempurl);
   request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
   QString mess="requesting "+tempurl;
