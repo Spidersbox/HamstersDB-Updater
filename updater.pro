@@ -2,6 +2,7 @@ TEMPLATE = app
 TARGET = HamstersDB-Updater
 
 QT += network
+CONFIG += console
 
 greaterThan(QT_MAJOR_VERSION,4): QT += widgets
 
@@ -9,8 +10,6 @@ CONFIG += c++17
 
 # add no pie so you can click on your app to run in linux
 QMAKE_LFLAGS += -no-pie
-
-#LIBS += -Wl,-Bstatic
 
 OBJECTS_DIR = build
 MOC_DIR = build
@@ -25,7 +24,6 @@ FORMS = src/forms/mainwindow.ui
 windows:DEFINES += WIN32
 windows:RC_FILE = src/updater.rc
 
-windows:LIBS += -static-libgcc 
 
 
 !windows:!mac{
@@ -43,4 +41,11 @@ macx:LIBS += -framework Foundation -framework ApplicationServices -framework App
 macx:DEFINES += MAC_OSX MSG_NOSIGNAL=0
 macx:ICON = src/images/spb.icns
 macx:TARGET = "HamstersDB-Updater"
+
+INCLUDEPATH += $$OPENSSL_INCLUDE_PATH
+LIBS += $$join(OPENSSL_LIB_PATH,,-L,)
+LIBS += -lssl -lcrypto 
+# -lgdi32 has to happen after -lcrypto (see  #681)
+windows:LIBS += -lws2_32 -lshlwapi -lmswsock -lole32 -loleaut32 -luuid -lgdi32
+windows:LIBS += -static-libgcc -static-libstdc++ -Wl,-Bstatic -lstdc++ -lpthread -Wl,--stack,16777216
 

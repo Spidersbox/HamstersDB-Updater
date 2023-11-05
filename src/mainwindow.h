@@ -42,6 +42,7 @@ private:
   void download(const QUrl &downTo,QNetworkReply *reply);
   QString getDownloadLocation(QString location);
   QString GetDefaultAppName(QString appName);
+  QString GetDefaultAppLocation();
 
 private slots:
   void start();

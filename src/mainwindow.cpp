@@ -1,4 +1,7 @@
 #include <QtGlobal> // for checking qt version
+#include<QDebug> // for qDebug()
+#include <QSslSocket>
+
 #if QT_VERSION >= 0x050000
  #include <QApplication>
  #include <QtWidgets>
@@ -19,16 +22,16 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <openssl/crypto.h>
 
 bool sucess=false;
 
 QString icon="icon";// name of your icon in the res file
 QString dirName="HamstersDB";
 QString appName="HamstersDB";
-QString downLocation="https://republichams.net/Downloads/"+dirName;
+QString downLocation="http://down.republichams.net/Downloads/"+dirName;
 
-QString appPath=QDir::homePath()+"/"+dirName+"/";
-
+//QString appPath=QDir::homePath()+"/"+dirName+"/";
 
 //-------------------------------------------------------------------------------------
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -81,7 +84,13 @@ MainWindow::~MainWindow()
 //-------------------------------------------------------------------------------------
 void MainWindow::start()
 {
+//qDebug()<<"Is SSL Enabled? "<<QSslSocket::supportsSsl();
+//qDebug()<<"SSL Library Build Version " << QSslSocket::sslLibraryBuildVersionString();
+//qDebug()<<"SSL Library Version String (locally) "<<QSslSocket::sslLibraryVersionString();
+
+  QString appPath=GetDefaultAppLocation();
   QString temp="checking path "+appPath;
+qDebug()<<temp<<"\n";
   ui->TextEdit->append(temp+"\n");
   try
   {
@@ -158,7 +167,9 @@ qDebug()<<temp;
     temp="launching";
     ui->TextEdit->append(temp);
     QString strAppFilename=GetDefaultAppName(appName);
-  QString strPathApp=appPath+appName;
+//qDebug()<<strAppFilename;
+    QString strPathApp="\""+appPath+strAppFilename+"\"";
+//qDebug()<<"launching "<<strPathApp;
     QProcess::startDetached(strPathApp);
     exit(0);
   }
@@ -216,6 +227,7 @@ void MainWindow::download(const QUrl &downTo,QNetworkReply *reply)
   QNetworkRequest request;
 
   QString tempurl=getDownloadLocation(downLocation)+"/"+appFilename;
+//qDebug()<<"tempurl "<<tempurl;
   request.setUrl(tempurl);
   request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
   QString mess="requesting "+tempurl;
@@ -242,6 +254,7 @@ void MainWindow::download(const QUrl &downTo,QNetworkReply *reply)
   request.setSslConfiguration(QSslConfiguration::defaultConfiguration());
   request.setRawHeader("User-Agent", "version.txt request");
 
+  QString appPath=GetDefaultAppLocation();
   FileName=appPath+"version.txt";
   networkTimer->start();
   reply = manager.get(request);
@@ -255,7 +268,8 @@ void MainWindow::download(const QUrl &downTo,QNetworkReply *reply)
 
   // launch app
   QString strAppFilename=GetDefaultAppName(appName);
-  QString strPathApp=appPath+appName;
+  QString strPathApp="\""+appPath+strAppFilename+"\"";
+qDebug()<<"launching "<<strPathApp;
   mess="launching  "+strAppFilename;
   ui->TextEdit->append(mess);
   QProcess::startDetached(strPathApp);
@@ -390,3 +404,19 @@ QString MainWindow::GetDefaultAppName(QString appName)
   return appName;
 }
 
+//-------------------------------------------------------------------------------------
+QString MainWindow::GetDefaultAppLocation()
+{
+#ifdef WIN32
+  // Windows
+  return "c:/Program Files/"+dirName+"/";
+#endif
+
+#ifdef MAC_OSX
+  // MAC
+  return "/Applications/"+dirName+".app/Contents/MacOS/";
+#endif
+
+  // Unix
+  return QDir::homePath()+dirName+"/";
+}
