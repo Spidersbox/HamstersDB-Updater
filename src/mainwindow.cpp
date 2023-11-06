@@ -22,7 +22,7 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <openssl/crypto.h>
+#include "version.h"
 
 bool sucess=false;
 
@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
   resize(280,280);
   move(x,y);
 
-  setWindowTitle(appName+" Launcher-Updater");
+  setWindowTitle(appName+" Launcher-Updater "+CLIENT_BUILD);
 
   networkTimer = new QTimer(this);
   networkTimer->setInterval(10000);
@@ -268,7 +268,7 @@ void MainWindow::download(const QUrl &downTo,QNetworkReply *reply)
 
   // launch app
   QString strAppFilename=GetDefaultAppName(appName);
-  QString strPathApp="\""+appPath+strAppFilename+"\"";
+  QString strPathApp=appPath+strAppFilename;
 qDebug()<<"launching "<<strPathApp;
   mess="launching  "+strAppFilename;
   ui->TextEdit->append(mess);
@@ -409,7 +409,8 @@ QString MainWindow::GetDefaultAppLocation()
 {
 #ifdef WIN32
   // Windows
-  return "c:/Program Files/"+dirName+"/";
+//  return "c:/Program Files/"+dirName+"/";
+return QDir::homePath()+"/AppData/Roaming/"+dirName+"/";
 #endif
 
 #ifdef MAC_OSX
