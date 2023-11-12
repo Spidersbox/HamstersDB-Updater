@@ -29,7 +29,7 @@ bool sucess=false;
 QString icon="icon";// name of your icon in the res file
 QString dirName="HamstersDB";
 QString appName="HamstersDB";
-QString downLocation="http://down.republichams.net/Downloads/"+dirName;
+QString downLocation="https://republichams.net/Downloads/"+dirName;
 
 //QString appPath=QDir::homePath()+"/"+dirName+"/";
 
